@@ -6,4 +6,4 @@
 
 2. ping this server (change the ip for your server ip)
 
-`python pingpong.py ping --server=192.168.2.100 --port=15000 --proto=udp`
+`python pingpong.py ping --server=192.168.2.100 --port=15000 --proto=udp --client-port=10000`

@@ -41,9 +41,13 @@ def run_udp_server(bind_ip, port):
             pass
 
 
-def run_udp_client(server_ip, port):
+def run_udp_client(server_ip, server_port, client_port):
     # Crea un socket UDP para el cliente
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    # Enlaza el socket del cliente a una dirección IP y puerto específicos
+    if client_port is not None:
+        client_socket.bind(('0.0.0.0', client_port))
 
     # Establece un tiempo de espera en el socket del cliente
     client_socket.settimeout(1.0)  # Tiempo de espera de 1 segundo
@@ -63,9 +67,9 @@ def run_udp_client(server_ip, port):
     while True:
         try:
             # Datos a enviar al servidor
-            print(f"Ping to {server_ip}:{port}")
+            print(f"Ping to {server_ip}:{server_port}")
             message = "Ping"
-            client_socket.sendto(message.encode(), (server_ip, port))
+            client_socket.sendto(message.encode(), (server_ip, server_port))
 
             # Espera a recibir la respuesta del servidor
             response, server_address = client_socket.recvfrom(1024)
@@ -85,6 +89,8 @@ if __name__ == '__main__':
     parser.add_argument('--bind', default='0.0.0.0',
                         help='Dirección IP para escuchar (solo para acción "listen")')
     parser.add_argument('--port', type=int, default=15000, help='Puerto UDP')
+    parser.add_argument('--client-port', type=int, default=None,
+                        help='Puerto UDP Cliente', metavar='client_port')
     parser.add_argument('--proto', default='udp', help='Protocolo')
     parser.add_argument(
         '--server', help='Dirección IP del servidor (solo para acción "ping")')
@@ -94,6 +100,6 @@ if __name__ == '__main__':
     if args.action == 'listen' and args.proto == 'udp':
         run_udp_server(args.bind, args.port)
     elif args.action == 'ping' and args.proto == 'udp' and args.server:
-        run_udp_client(args.server, args.port)
+        run_udp_client(args.server, args.port, args.client_port)
     else:
         print("Invalid command")
